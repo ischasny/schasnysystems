@@ -84,7 +84,7 @@
         }
 
         @keyframes particleFloat {
-            0% { transform: translateY(100vh) translateX(0px); opacity: 1; } /* MODIFIED: opacity is now 1 at the start */
+            0% { transform: translateY(100vh) translateX(0px); opacity: 1; }
             90% { opacity: 1; }
             100% { transform: translateY(-20px) translateX(50px); opacity: 0; }
         }
@@ -145,6 +145,10 @@
             backdrop-filter: blur(10px);
             font-family: 'Pixelify Sans', sans-serif;
             cursor: pointer;
+            /* Added for icon alignment */
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
         }
 
         .action-btn:hover {
@@ -153,6 +157,14 @@
             box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
             transform: translateY(-3px);
         }
+
+        /* Style for the new SVG icon */
+        .action-btn svg {
+            width: 1.2em;
+            height: 1.2em;
+            fill: currentColor;
+        }
+
 
         /* Responsive design */
         @media (max-width: 768px) {
@@ -235,7 +247,13 @@
             
             <!-- Actions -->
             <div class="actions">
-                 <a href="mailto:systems@schasny.org" class="action-btn">Contact Us</a>
+                 <a href="mailto:systems@schasny.org" class="action-btn">
+                    <!-- 8-bit envelope icon -->
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 5h20v2h-2v12h-16v-12h-2v-2zm4 2v10h12v-10h-12zm2 2h8v2h-8v-2zm0 4h5v2h-5v-2z" fill-rule="evenodd" clip-rule="evenodd"/>
+                    </svg>
+                    Contact Us
+                 </a>
             </div>
 
             <!-- Floating particles container -->
@@ -291,7 +309,12 @@
                 
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                
+                const duration = 4 + Math.random() * 4;
+                particle.style.animationDuration = duration + 's';
+                // FIX: Add a random negative delay to make particles appear instantly mid-flight
+                particle.style.animationDelay = `-${Math.random() * duration}s`;
+
                 particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
                 
                 particlesContainer.appendChild(particle);
