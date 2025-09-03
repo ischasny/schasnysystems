@@ -102,7 +102,7 @@
             font-family: 'Sixtyfour', monospace;
             font-size: clamp(1.1rem, 3.3vw, 2.2rem); /* 10% larger */
             font-weight: 400;
-            color: #a0a0a0;
+            color: #ffffff; /* Changed from #a0a0a0 */
             letter-spacing: 0.05em;
             display: block;
             text-shadow: 0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2);
@@ -262,16 +262,16 @@
             const titleSub = document.querySelector('.title-sub');
 
             // Apply subtle parallax movement to the title container
-            const offsetX = mouseX * 8;
-            const offsetY = mouseY * 8;
+            const offsetX = mouseX * 2.7; // Decreased from 4
+            const offsetY = mouseY * 2.7; // Decreased from 4
             title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
             // Apply dynamic shadow effect based on mouse position
             // The shadow moves opposite to the mouse for a depth effect
-            const mainShadowX1 = -mouseX * 8; // Increased from 5
-            const mainShadowY1 = -mouseY * 8; // Increased from 5
-            const mainShadowX2 = -mouseX * 16; // Increased from 10
-            const mainShadowY2 = -mouseY * 16; // Increased from 10
+            const mainShadowX1 = -mouseX * 2.64; // Increased from 2.2
+            const mainShadowY1 = -mouseY * 2.64; // Increased from 2.2
+            const mainShadowX2 = -mouseX * 5.28; // Increased from 4.4
+            const mainShadowY2 = -mouseY * 5.28; // Increased from 4.4
             titleMain.style.textShadow = `
                 ${mainShadowX1}px ${mainShadowY1}px 0 #64ffda, 
                 ${mainShadowX2}px ${mainShadowY2}px 0 #c82fec,
@@ -279,10 +279,10 @@
                 0 0 25px rgba(200, 47, 236, 0.3)
             `;
 
-            const subShadowX1 = -mouseX * 5; // Increased from 3
-            const subShadowY1 = -mouseY * 5; // Increased from 3
-            const subShadowX2 = -mouseX * 10; // Increased from 6
-            const subShadowY2 = -mouseY * 10; // Increased from 6
+            const subShadowX1 = -mouseX * 1.98; // Increased from 1.65
+            const subShadowY1 = -mouseY * 1.98; // Increased from 1.65
+            const subShadowX2 = -mouseX * 3.96; // Increased from 3.3
+            const subShadowY2 = -mouseY * 3.96; // Increased from 3.3
             titleSub.style.textShadow = `
                 ${subShadowX1}px ${subShadowY1}px 0 #64ffda, 
                 ${subShadowX2}px ${subShadowY2}px 0 #c82fec,
@@ -299,16 +299,6 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
 
 
