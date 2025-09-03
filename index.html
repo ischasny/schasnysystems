@@ -20,14 +20,26 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             height: 100vh;
-            overflow: hidden;
             background: linear-gradient(180deg, #0a0415 0%, #1a0f2e 30%, #2d1b47 60%, #4a2c5a 100%);
+            /* Centering the new wrapper */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* New wrapper to constrain the scene on large screens */
+        .scene-wrapper {
             position: relative;
+            width: 100%;
+            max-width: 1300px; /* Max width for the effects */
+            height: 100vh;
+            margin: 0 auto;
+            overflow: hidden; /* This is key to clip effects */
         }
 
         .container {
             width: 100%;
-            height: 100vh;
+            height: 100%; /* Changed from 100vh to fill wrapper */
             position: relative;
             display: flex;
             flex-direction: column;
@@ -72,8 +84,7 @@
         }
 
         @keyframes particleFloat {
-            0% { transform: translateY(100vh) translateX(0px); opacity: 0; }
-            10% { opacity: 1; }
+            0% { transform: translateY(100vh) translateX(0px); opacity: 1; } /* MODIFIED: opacity is now 1 at the start */
             90% { opacity: 1; }
             100% { transform: translateY(-20px) translateX(50px); opacity: 0; }
         }
@@ -108,32 +119,39 @@
             text-shadow: 0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2);
             transition: text-shadow 0.1s ease-out;
         }
-
-        /* Contact email */
-        .contact {
+        
+        /* Action Buttons Container */
+        .actions {
             position: absolute;
             bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .action-btn {
             color: #a0a0a0;
             font-size: clamp(0.8rem, 2vw, 1rem);
             text-decoration: none;
             transition: all 0.3s ease;
-            z-index: 10;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.5rem;
             border: 1px solid rgba(100, 255, 218, 0.3);
             border-radius: 20px;
             background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(10px);
-            /* Changed font-family to Pixelify Sans */
             font-family: 'Pixelify Sans', sans-serif;
+            cursor: pointer;
         }
 
-        .contact:hover {
+        .action-btn:hover {
             color: #64ffda;
             border-color: rgba(100, 255, 218, 0.8);
             box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
-            transform: translateX(-50%) translateY(-5px);
+            transform: translateY(-3px);
         }
 
         /* Responsive design */
@@ -142,8 +160,10 @@
                 padding: 0 1rem;
             }
 
-            .contact {
+            .actions {
                 bottom: 1rem;
+            }
+             .action-btn {
                 font-size: 0.8rem;
             }
         }
@@ -178,179 +198,153 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 1;
-            filter: blur(45px); /* Further reduced blur for more intensity */
-            
-            /* Animation setup */
+            filter: blur(20px);
             background-size: 200% 200%;
             animation: aurora-flow 18s linear infinite;
-
-            /* Multiple color gradients, inspired by your example */
             background-image: 
-                radial-gradient(at 10% 95%, rgba(100, 255, 218, 0.7875) 0px, transparent 50%), /* 1.5x more opacity */
-                radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.675) 0px, transparent 50%), /* 1.5x more opacity */
-                radial-gradient(at 45% 90%, rgba(100, 255, 218, 0.9) 0px, transparent 50%); /* 1.5x more opacity */
+                radial-gradient(at 10% 95%, rgba(100, 255, 218, 1) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.95) 0px, transparent 50%),
+                radial-gradient(at 45% 90%, rgba(100, 255, 218, 1) 0px, transparent 50%);
         }
 
         @keyframes aurora-flow {
-            0% {
-                background-position: 50% 50%, 30% 100%, 100% 10%;
-            }
-            33% {
-                background-position: 10% 75%, 40% 80%, 60% 20%;
-            }
-            66% {
-                background-position: 25% 35%, 80% 50%, 10% 10%;
-            }
-            100% {
-                background-position: 50% 50%, 30% 100%, 100% 10%;
-            }
+            0% { background-position: 50% 50%, 30% 100%, 100% 10%; }
+            33% { background-position: 10% 75%, 40% 80%, 60% 20%; }
+            66% { background-position: 25% 35%, 80% 50%, 10% 10%; }
+            100% { background-position: 50% 50%, 30% 100%, 100% 10%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Starfield background -->
-        <div class="stars" id="stars"></div>
+    <!-- New wrapper to constrain the scene on large screens -->
+    <div class="scene-wrapper">
+        <div class="container">
+            <!-- Starfield background -->
+            <div class="stars" id="stars"></div>
 
-        <!-- Glowing orbs -->
-        <div class="glow-orb"></div>
-        <div class="glow-orb"></div>
-        <div class="glow-orb"></div>
+            <!-- Glowing orbs -->
+            <div class="glow-orb"></div>
+            <div class="glow-orb"></div>
+            <div class="glow-orb"></div>
 
-        <!-- Main title -->
-        <div class="title">
-            <div class="title-main">SCHASNY</div>
-            <div class="title-sub">systems</div>
+            <!-- Main title -->
+            <div class="title">
+                <div class="title-main">SCHASNY</div>
+                <div class="title-sub">systems</div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="actions">
+                 <a href="mailto:systems@schasny.org" class="action-btn">Contact Us</a>
+            </div>
+
+            <!-- Floating particles container -->
+            <div id="particles"></div>
+            
         </div>
-
-        <!-- Contact email -->
-        <a href="mailto:systems@schasny.org" class="contact">systems@schasny.org</a>
-
-        <!-- Floating particles container -->
-        <div id="particles"></div>
-        
-        <!-- Northern Lights -->
-        <div class="northern-lights"></div>
     </div>
+    
+    <!-- Northern Lights is now outside the wrapper for full-screen width -->
+    <div class="northern-lights"></div>
 
     <script>
-        // Generate random stars
+        // --- Visual Effects Functions ---
+
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starCount = 143; /* Increased from 130 */
+            const starCount = 143; 
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 60 + '%'; // Only in upper portion
+                star.style.top = Math.random() * 60 + '%';
                 star.style.animationDelay = Math.random() * 3 + 's';
-                /* Animation is now even faster, between 0.5 and 1.5 seconds */
                 star.style.animationDuration = (0.5 + Math.random() * 1) + 's';
 
-                // Random star sizes - scaled up by 3.6x
                 const sizeRandom = Math.random();
                 if (sizeRandom < 0.7) {
-                    // 70% small stars (3.6-7.2px)
                     const size = (1 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else if (sizeRandom < 0.9) {
-                    // 20% medium stars (7.2-10.8px)
                     const size = (2 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else {
-                    // 10% large stars (10.8-14.4px)
                     const size = (3 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 }
-
                 starsContainer.appendChild(star);
             }
         }
 
-        // Generate floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleColors = ['#64ffda', '#c82fec'];
+            const maxParticles = 300;
+
+            const createParticle = () => {
+                const particle = document.createElement('div');
+                const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
+                
+                particlesContainer.appendChild(particle);
+
+                setTimeout(() => {
+                    if (particle.parentNode) particle.parentNode.removeChild(particle);
+                }, 8000);
+            };
+
+            for (let i = 0; i < 150; i++) {
+                createParticle();
+            }
 
             setInterval(() => {
-                if (particlesContainer.children.length < 300) { // Increased from 52
-                    const particle = document.createElement('div');
-                    const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
-                    
-                    particle.className = 'particle';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.animationDuration = (4 + Math.random() * 4) + 's';
-                    // Apply one of the random colors
-                    particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
-                    
-                    particlesContainer.appendChild(particle);
-
-                    // Remove particle after animation
-                    setTimeout(() => {
-                        if (particle.parentNode) {
-                            particle.parentNode.removeChild(particle);
-                        }
-                    }, 8000);
-                }
-            }, 30);
+                if (particlesContainer.children.length < maxParticles) createParticle();
+            }, 50);
         }
 
-        // Add parallax effect to title text on mouse move
+        // --- Event Listeners and Initializers ---
+
         document.addEventListener('mousemove', function(e) {
-            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
-            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+            // We need to calculate the mouse position relative to the scene wrapper, not the whole window
+            const scene = document.querySelector('.scene-wrapper');
+            const rect = scene.getBoundingClientRect();
+            const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+            const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
 
             const title = document.querySelector('.title');
             const mainTitle = document.querySelector('.title-main');
             const subTitle = document.querySelector('.title-sub');
 
-            // Parallax for the container
-            const offsetX = mouseX * 4.102; /* Reduced from 5.86 by 30% */
+            const offsetX = mouseX * 4.102;
             const offsetY = mouseY * 4.102; 
+            const shadowOffsetX1 = mouseX * 2.46456;
+            const shadowOffsetY1 = mouseY * 2.46456;
+            const shadowOffsetX2 = mouseX * 4.92912;
+            const shadowOffsetY2 = mouseY * 4.92912;
 
-            // Parallax for the shadow (more prominent)
-            const shadowOffsetX1 = mouseX * 2.46456; /* Increased from 2.0538 by 20% */
-            const shadowOffsetY1 = mouseY * 2.46456; /* Increased from 2.0538 by 20% */
-            const shadowOffsetX2 = mouseX * 4.92912; /* Increased from 4.1076 by 20% */
-            const shadowOffsetY2 = mouseY * 4.92912; /* Increased from 4.1076 by 20% */
-
-            // Apply subtle parallax movement to the title container
             title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
-            // Update text-shadow for both main and sub titles
             const baseShadowMain = `0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3)`;
             const baseShadowSub = `0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2)`;
 
             mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
             subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
         });
+        
+        // Initialize all visual effects immediately
+        createStars();
+        createParticles();
 
-        // Initialize effects
-        document.addEventListener('DOMContentLoaded', function() {
-            createStars();
-            createParticles();
-        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
