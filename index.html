@@ -95,11 +95,20 @@
             z-index: 10;
             position: relative;
             line-height: 1.2;
+            /* Added hovering animation by default */
+            animation: hoverFloat 6s ease-in-out infinite; /* Made faster */
+        }
+        
+        /* New keyframes for the hovering effect */
+        @keyframes hoverFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-16px); } /* Made 20% less prominent */
+            100% { transform: translateY(0px); }
         }
 
         .title-main {
             font-family: 'Sixtyfour', monospace;
-            font-size: clamp(3.85rem, 11vw, 7.7rem); /* 10% larger */
+            font-size: clamp(2.5rem, 11vw, 7.7rem); /* FIX: Reduced minimum font size */
             font-weight: 400;
             color: #ffffff;
             letter-spacing: 0.1em;
@@ -169,7 +178,7 @@
         /* Responsive design */
         @media (max-width: 768px) {
             .title {
-                padding: 0 1rem;
+                padding: 0 1.5rem; /* Increased padding for small screens */
             }
 
             .actions {
@@ -268,9 +277,11 @@
     <script>
         // --- Visual Effects Functions ---
 
+        const isMobile = window.innerWidth <= 768;
+
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starCount = 143; 
+            const starCount = isMobile ? Math.floor(143 / 1.5) : 143; 
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
@@ -301,7 +312,8 @@
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleColors = ['#64ffda', '#c82fec'];
-            const maxParticles = 300;
+            const maxParticles = isMobile ? Math.floor(300 / 1.5) : 300;
+            const initialParticles = isMobile ? Math.floor(150 / 1.5) : 150;
 
             const createParticle = () => {
                 const particle = document.createElement('div');
@@ -324,7 +336,7 @@
                 }, 8000);
             };
 
-            for (let i = 0; i < 150; i++) {
+            for (let i = 0; i < initialParticles; i++) {
                 createParticle();
             }
 
@@ -334,35 +346,49 @@
         }
 
         // --- Event Listeners and Initializers ---
+        const scene = document.querySelector('.scene-wrapper');
+        const title = document.querySelector('.title');
+        const mainTitle = document.querySelector('.title-main');
+        const subTitle = document.querySelector('.title-sub');
 
-        document.addEventListener('mousemove', function(e) {
-            // We need to calculate the mouse position relative to the scene wrapper, not the whole window
-            const scene = document.querySelector('.scene-wrapper');
-            const rect = scene.getBoundingClientRect();
-            const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-            const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+        // Check if it's a touch device before adding mouse-specific events
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+        if (!isTouchDevice) {
+            scene.addEventListener('mousemove', function(e) {
+                // We need to calculate the mouse position relative to the scene wrapper, not the whole window
+                const rect = scene.getBoundingClientRect();
+                const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+                const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-            const title = document.querySelector('.title');
-            const mainTitle = document.querySelector('.title-main');
-            const subTitle = document.querySelector('.title-sub');
+                const offsetX = mouseX * 4.102;
+                const offsetY = mouseY * 4.102; 
+                const shadowOffsetX1 = mouseX * 5.54526;
+                const shadowOffsetY1 = mouseY * 5.54526;
+                const shadowOffsetX2 = mouseX * 11.09052;
+                const shadowOffsetY2 = mouseY * 11.09052;
 
-            const offsetX = mouseX * 4.102;
-            const offsetY = mouseY * 4.102; 
-            const shadowOffsetX1 = mouseX * 2.46456;
-            const shadowOffsetY1 = mouseY * 2.46456;
-            const shadowOffsetX2 = mouseX * 4.92912;
-            const shadowOffsetY2 = mouseY * 4.92912;
+                title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
-            title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                const baseShadowMain = `0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3)`;
+                const baseShadowSub = `0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2)`;
 
-            const baseShadowMain = `0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3)`;
-            const baseShadowSub = `0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2)`;
+                mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
+                subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
+            });
+            
+            scene.addEventListener('mouseleave', () => {
+                // Reset transform to allow CSS animation to take over
+                title.style.transform = '';
 
-            mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
-            subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
-        });
-        
+                // Also reset text shadows to their base state
+                const baseShadowMain = `0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3)`;
+                const baseShadowSub = `0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2)`;
+                mainTitle.style.textShadow = baseShadowMain;
+                subTitle.style.textShadow = baseShadowSub;
+            });
+        }
+
         // Initialize all visual effects immediately
         createStars();
         createParticles();
