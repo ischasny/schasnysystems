@@ -34,6 +34,7 @@
             height: 100dvh; /* Changed from 100vh */
             margin: 0 auto;
             overflow: hidden;
+            z-index: 10; /* Ensure content is on top */
         }
 
         .container {
@@ -223,8 +224,9 @@
             height: 10vh; /* Use viewport height */
             overflow: hidden;
             pointer-events: none;
-            z-index: 1;
-            filter: blur(20px);
+            z-index: 9; /* Adjusted for layering */
+            filter: blur(16px); /* Reduced blur for less intensity */
+            opacity: 0.8; /* Reduced opacity for less intensity */
             background-size: 200% 200%;
             animation: aurora-flow 15s linear infinite;
             background-image: 
@@ -235,8 +237,8 @@
 
         /* Safari-specific fixes */
         .safari-browser .northern-lights {
-            filter: blur(15px); /* Reduced blur for better Safari performance */
-            opacity: 0.9;
+            filter: blur(12px); /* Reduced blur for better Safari performance */
+            opacity: 0.7; /* Reduced opacity */
             background-image: 
                 radial-gradient(at 10% 95%, rgba(100, 255, 218, 0.8) 0px, transparent 60%),
                 radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.7) 0px, transparent 60%),
@@ -260,6 +262,30 @@
             50% { background-position: 100% 50%, 0% 0%, 50% 100%; }
             100% { background-position: 0% 50%, 100% 100%, 50% 0%; }
         }
+
+        /* New CSS for the mountain ridge */
+        .mountain-ridge {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20vh; /* Setting a constant height to prevent vertical resizing */
+            z-index: 8; /* Adjusted for layering */
+            pointer-events: none;
+            opacity: 0.6; /* Added transparency */
+        }
+
+        .mountain-ridge svg {
+            display: block;
+            width: 100%;
+            height: 100%; /* Making the SVG fill the new fixed height container */
+        }
+        
+        /* The fill color of the mountain SVG will match the darkest part of the background gradient */
+        .mountain-ridge svg path {
+            fill: #0a0415;
+        }
+
     </style>
 </head>
 <body>
@@ -293,10 +319,12 @@
 
             <!-- Floating particles container -->
             <div id="particles"></div>
-            
         </div>
     </div>
     
+    <!-- Mountain ridge container -->
+    <div class="mountain-ridge" id="mountain-ridge"></div>
+
     <!-- Northern Lights is now outside the wrapper for full-screen width -->
     <div class="northern-lights"></div>
 
@@ -426,9 +454,93 @@
             });
         }
 
+        // --- Mountain Ridge Generation Script ---
+
+        function createMountainRidge() {
+            const WIDTH = 500;
+            const HEIGHT = 100;
+            const ITERATIONS = 6;
+            const ROUGHNESS = 0.7;
+
+            // mountain divider
+            function divider() {
+                const segments = Math.pow(2, ITERATIONS);
+                const points = line(WIDTH, displaceMap(HEIGHT, HEIGHT / 3, ROUGHNESS, segments));
+                const path = convertPath(WIDTH, HEIGHT, points);
+                const svg = genSvg(WIDTH, HEIGHT, path);
+
+                const mountainContainer = document.getElementById('mountain-ridge');
+                mountainContainer.innerHTML = svg;
+            }
+
+            // generate midpoint displacement points
+            function displaceMap(height, displace, roughness, power) {
+              const points = []
+
+              // set initial left point
+              points[0] = height / 2 + (Math.random() * displace * 2) - displace
+
+              // set initial right point
+              points[power] = height / 2 + (Math.random() * displace * 2) - displace
+              displace *= roughness
+
+              // increase number of segments to maximum
+              for (let i = 1; i < power; i *= 2) {
+                // for each segment, find centre point
+                for (let j = (power / i) / 2; j < power; j += power / i) {
+                  points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2)
+                  points[j] += (Math.random() * displace * 2) - displace
+                }
+
+                // reduce random range
+                displace *= roughness
+              }
+
+              return points
+            }
+
+            // format points in [x, y] array
+            function line(width, points) {
+              const sep = width / (points.length - 1)
+              return points.map((val, i) => ([
+                i * sep,
+                val
+              ]))
+            }
+
+            // convert points into SVG path
+            function convertPath(width, height, points) {
+              // add first M (move) command
+              const first = points.shift()
+              let path = `M ${first[0]} ${first[1]}`
+
+              // iterate through points adding L (line) commands to path
+              points.forEach(val => {
+                path += ` L ${val[0]} ${val[1]}`
+              })
+
+              // close path
+              path += ` L ${width} ${height} L 0 ${height} Z`
+
+              return path
+            }
+
+            // generate SVG from path
+            function genSvg(width, height, path) {
+              return `
+                <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="currentColor" d="${path}"></path>
+                </svg>
+              `
+            }
+            
+            divider();
+        }
+
         // Initialize all visual effects immediately
         createStars();
         createParticles();
+        createMountainRidge();
 
     </script>
 </body>
