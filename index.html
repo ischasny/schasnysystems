@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schasny Systems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Existing font -->
+    <link href="https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap" rel="stylesheet">
+    <!-- Added Pixelify Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0415 0%, #1a0f2e 30%, #2d1b47 60%, #4a2c5a 100%);
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Animated starfield background */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #FBF3D5; /* Changed to user-specified yellow */
+            border-radius: 50%;
+            opacity: 1; /* Increased from 0.8 for overall brightness */
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; transform: scale(1); } /* Increased starting opacity from 0.3 */
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Glowing particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #64ffda 0%, transparent 70%);
+            border-radius: 50%;
+            animation: particleFloat 6s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-20px) translateX(50px); opacity: 0; }
+        }
+
+        /* Main title */
+        .title {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            line-height: 1.2;
+        }
+
+        .title-main {
+            font-family: 'Sixtyfour', monospace;
+            font-size: clamp(3.85rem, 11vw, 7.7rem); /* 10% larger */
+            font-weight: 400;
+            color: #ffffff;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.2rem; /* Moved closer */
+            display: block;
+            text-shadow: 0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3);
+            transition: text-shadow 0.1s ease-out;
+        }
+
+        .title-sub {
+            font-family: 'Sixtyfour', monospace;
+            font-size: clamp(1.1rem, 3.3vw, 2.2rem); /* 10% larger */
+            font-weight: 400;
+            color: #a0a0a0;
+            letter-spacing: 0.05em;
+            display: block;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2);
+            transition: text-shadow 0.1s ease-out;
+        }
+
+        /* Contact email */
+        .contact {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #a0a0a0;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            z-index: 10;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            /* Changed font-family to Pixelify Sans */
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+
+        .contact:hover {
+            color: #64ffda;
+            border-color: rgba(100, 255, 218, 0.8);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.3);
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .title {
+                padding: 0 1rem;
+            }
+
+            .contact {
+                bottom: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Additional glowing effects */
+        .glow-orb {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+
+        .glow-orb:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .glow-orb:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+        .glow-orb:nth-child(3) { bottom: 30%; left: 20%; animation-delay: 4s; }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            33% { transform: translate(20px, -30px) scale(1.1); opacity: 0.5; }
+            66% { transform: translate(-15px, 20px) scale(0.9); opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Starfield background -->
+        <div class="stars" id="stars"></div>
+
+        <!-- Glowing orbs -->
+        <div class="glow-orb"></div>
+        <div class="glow-orb"></div>
+        <div class="glow-orb"></div>
+
+        <!-- Main title -->
+        <div class="title">
+            <div class="title-main">SCHASNY</div>
+            <div class="title-sub">systems</div>
+        </div>
+
+        <!-- Contact email -->
+        <a href="mailto:systems@schasny.org" class="contact">systems@schasny.org</a>
+
+        <!-- Floating particles container -->
+        <div id="particles"></div>
+    </div>
+
+        <script>
+        // Generate random stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 143; /* Increased from 130 */
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 60 + '%'; // Only in upper portion
+                star.style.animationDelay = Math.random() * 3 + 's';
+                /* Animation is now even faster, between 0.5 and 1.5 seconds */
+                star.style.animationDuration = (0.5 + Math.random() * 1) + 's';
+
+                // Random star sizes - scaled up by 1.3x
+                const sizeRandom = Math.random();
+                if (sizeRandom < 0.7) {
+                    // 70% small stars (1.3-2.6px)
+                    const size = (1 + Math.random()) * 1.3;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                } else if (sizeRandom < 0.9) {
+                    // 20% medium stars (2.6-3.9px)
+                    const size = (2 + Math.random()) * 1.3;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                } else {
+                    // 10% large stars (3.9-5.2px)
+                    const size = (3 + Math.random()) * 1.3;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                }
+
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Generate floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+
+            setInterval(() => {
+                if (particlesContainer.children.length < 20) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                    particlesContainer.appendChild(particle);
+
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 8000);
+                }
+            }, 200);
+        }
+
+        // Add parallax effect to title text on mouse move
+        document.addEventListener('mousemove', function(e) {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2; // -1 to 1
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+
+            const title = document.querySelector('.title');
+            const titleMain = document.querySelector('.title-main');
+            const titleSub = document.querySelector('.title-sub');
+
+            // Apply subtle parallax movement to the title container
+            const offsetX = mouseX * 8;
+            const offsetY = mouseY * 8;
+            title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+            // Apply dynamic shadow effect based on mouse position
+            // The shadow moves opposite to the mouse for a depth effect
+            const mainShadowX1 = -mouseX * 8; // Increased from 5
+            const mainShadowY1 = -mouseY * 8; // Increased from 5
+            const mainShadowX2 = -mouseX * 16; // Increased from 10
+            const mainShadowY2 = -mouseY * 16; // Increased from 10
+            titleMain.style.textShadow = `
+                ${mainShadowX1}px ${mainShadowY1}px 0 #64ffda, 
+                ${mainShadowX2}px ${mainShadowY2}px 0 #c82fec,
+                0 0 15px rgba(100, 255, 218, 0.5),
+                0 0 25px rgba(200, 47, 236, 0.3)
+            `;
+
+            const subShadowX1 = -mouseX * 5; // Increased from 3
+            const subShadowY1 = -mouseY * 5; // Increased from 3
+            const subShadowX2 = -mouseX * 10; // Increased from 6
+            const subShadowY2 = -mouseY * 10; // Increased from 6
+            titleSub.style.textShadow = `
+                ${subShadowX1}px ${subShadowY1}px 0 #64ffda, 
+                ${subShadowX2}px ${subShadowY2}px 0 #c82fec,
+                0 0 10px rgba(100, 255, 218, 0.4),
+                0 0 20px rgba(200, 47, 236, 0.2)
+            `;
+        });
+
+        // Initialize effects
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            createParticles();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
