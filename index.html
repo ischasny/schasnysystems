@@ -47,12 +47,12 @@
 
         .star {
             position: absolute;
-            width: 2px;
-            height: 2px;
+            /* width and height are set dynamically by JS */
             background: #FBF3D5; /* Changed to user-specified yellow */
-            border-radius: 50%;
             opacity: 1; /* Increased from 0.8 for overall brightness */
             animation: twinkle 3s infinite alternate;
+            /* This creates a 4-pointed sparkle shape like the image */
+            clip-path: polygon(50% 0%, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0% 50%, 42% 42%);
         }
 
         @keyframes twinkle {
@@ -92,7 +92,7 @@
             font-weight: 400;
             color: #ffffff;
             letter-spacing: 0.1em;
-            margin-bottom: 0.2rem; /* Moved closer */
+            margin-bottom: -0.5rem; /* Reduced padding */
             display: block;
             text-shadow: 0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3);
             transition: text-shadow 0.1s ease-out;
@@ -167,6 +167,44 @@
             33% { transform: translate(20px, -30px) scale(1.1); opacity: 0.5; }
             66% { transform: translate(-15px, 20px) scale(0.9); opacity: 0.4; }
         }
+
+        /* Northern Lights Effect v2 */
+        .northern-lights {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(45px); /* Further reduced blur for more intensity */
+            
+            /* Animation setup */
+            background-size: 200% 200%;
+            animation: aurora-flow 18s linear infinite;
+
+            /* Multiple color gradients, inspired by your example */
+            background-image: 
+                radial-gradient(at 10% 95%, rgba(100, 255, 218, 0.7875) 0px, transparent 50%), /* 1.5x more opacity */
+                radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.675) 0px, transparent 50%), /* 1.5x more opacity */
+                radial-gradient(at 45% 90%, rgba(100, 255, 218, 0.9) 0px, transparent 50%); /* 1.5x more opacity */
+        }
+
+        @keyframes aurora-flow {
+            0% {
+                background-position: 50% 50%, 30% 100%, 100% 10%;
+            }
+            33% {
+                background-position: 10% 75%, 40% 80%, 60% 20%;
+            }
+            66% {
+                background-position: 25% 35%, 80% 50%, 10% 10%;
+            }
+            100% {
+                background-position: 50% 50%, 30% 100%, 100% 10%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -190,9 +228,12 @@
 
         <!-- Floating particles container -->
         <div id="particles"></div>
+        
+        <!-- Northern Lights -->
+        <div class="northern-lights"></div>
     </div>
 
-        <script>
+    <script>
         // Generate random stars
         function createStars() {
             const starsContainer = document.getElementById('stars');
@@ -207,21 +248,21 @@
                 /* Animation is now even faster, between 0.5 and 1.5 seconds */
                 star.style.animationDuration = (0.5 + Math.random() * 1) + 's';
 
-                // Random star sizes - scaled up by 1.3x
+                // Random star sizes - scaled up by 3.6x
                 const sizeRandom = Math.random();
                 if (sizeRandom < 0.7) {
-                    // 70% small stars (1.3-2.6px)
-                    const size = (1 + Math.random()) * 1.3;
+                    // 70% small stars (3.6-7.2px)
+                    const size = (1 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else if (sizeRandom < 0.9) {
-                    // 20% medium stars (2.6-3.9px)
-                    const size = (2 + Math.random()) * 1.3;
+                    // 20% medium stars (7.2-10.8px)
+                    const size = (2 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else {
-                    // 10% large stars (3.9-5.2px)
-                    const size = (3 + Math.random()) * 1.3;
+                    // 10% large stars (10.8-14.4px)
+                    const size = (3 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 }
@@ -233,13 +274,19 @@
         // Generate floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
+            const particleColors = ['#64ffda', '#c82fec'];
 
             setInterval(() => {
-                if (particlesContainer.children.length < 20) {
+                if (particlesContainer.children.length < 300) { // Increased from 52
                     const particle = document.createElement('div');
+                    const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                    
                     particle.className = 'particle';
                     particle.style.left = Math.random() * 100 + '%';
                     particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                    // Apply one of the random colors
+                    particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
+                    
                     particlesContainer.appendChild(particle);
 
                     // Remove particle after animation
@@ -249,7 +296,7 @@
                         }
                     }, 8000);
                 }
-            }, 200);
+            }, 30);
         }
 
         // Add parallax effect to title text on mouse move
@@ -258,37 +305,28 @@
             const mouseY = (e.clientY / window.innerHeight - 0.5) * 2; // -1 to 1
 
             const title = document.querySelector('.title');
-            const titleMain = document.querySelector('.title-main');
-            const titleSub = document.querySelector('.title-sub');
+            const mainTitle = document.querySelector('.title-main');
+            const subTitle = document.querySelector('.title-sub');
+
+            // Parallax for the container
+            const offsetX = mouseX * 4.102; /* Reduced from 5.86 by 30% */
+            const offsetY = mouseY * 4.102; 
+
+            // Parallax for the shadow (more prominent)
+            const shadowOffsetX1 = mouseX * 2.46456; /* Increased from 2.0538 by 20% */
+            const shadowOffsetY1 = mouseY * 2.46456; /* Increased from 2.0538 by 20% */
+            const shadowOffsetX2 = mouseX * 4.92912; /* Increased from 4.1076 by 20% */
+            const shadowOffsetY2 = mouseY * 4.92912; /* Increased from 4.1076 by 20% */
 
             // Apply subtle parallax movement to the title container
-            const offsetX = mouseX * 2.7; // Decreased from 4
-            const offsetY = mouseY * 2.7; // Decreased from 4
             title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
-            // Apply dynamic shadow effect based on mouse position
-            // The shadow moves opposite to the mouse for a depth effect
-            const mainShadowX1 = -mouseX * 2.64; // Increased from 2.2
-            const mainShadowY1 = -mouseY * 2.64; // Increased from 2.2
-            const mainShadowX2 = -mouseX * 5.28; // Increased from 4.4
-            const mainShadowY2 = -mouseY * 5.28; // Increased from 4.4
-            titleMain.style.textShadow = `
-                ${mainShadowX1}px ${mainShadowY1}px 0 #64ffda, 
-                ${mainShadowX2}px ${mainShadowY2}px 0 #c82fec,
-                0 0 15px rgba(100, 255, 218, 0.5),
-                0 0 25px rgba(200, 47, 236, 0.3)
-            `;
+            // Update text-shadow for both main and sub titles
+            const baseShadowMain = `0 0 15px rgba(100, 255, 218, 0.5), 0 0 25px rgba(200, 47, 236, 0.3)`;
+            const baseShadowSub = `0 0 10px rgba(100, 255, 218, 0.4), 0 0 20px rgba(200, 47, 236, 0.2)`;
 
-            const subShadowX1 = -mouseX * 1.98; // Increased from 1.65
-            const subShadowY1 = -mouseY * 1.98; // Increased from 1.65
-            const subShadowX2 = -mouseX * 3.96; // Increased from 3.3
-            const subShadowY2 = -mouseY * 3.96; // Increased from 3.3
-            titleSub.style.textShadow = `
-                ${subShadowX1}px ${subShadowY1}px 0 #64ffda, 
-                ${subShadowX2}px ${subShadowY2}px 0 #c82fec,
-                0 0 10px rgba(100, 255, 218, 0.4),
-                0 0 20px rgba(200, 47, 236, 0.2)
-            `;
+            mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
+            subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
         });
 
         // Initialize effects
@@ -299,6 +337,18 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
