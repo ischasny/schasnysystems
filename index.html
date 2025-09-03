@@ -102,7 +102,7 @@
         /* New keyframes for the hovering effect */
         @keyframes hoverFloat {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-16px); } /* Made 20% less prominent */
+            50% { transform: translateY(-11px); } /* Reduced amplitude by 30% */
             100% { transform: translateY(0px); }
         }
 
@@ -221,7 +221,7 @@
             z-index: 1;
             filter: blur(20px);
             background-size: 200% 200%;
-            animation: aurora-flow 18s linear infinite;
+            animation: aurora-flow 15s linear infinite;
             background-image: 
                 radial-gradient(at 10% 95%, rgba(100, 255, 218, 1) 0px, transparent 50%),
                 radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.95) 0px, transparent 50%),
@@ -229,10 +229,9 @@
         }
 
         @keyframes aurora-flow {
-            0% { background-position: 50% 50%, 30% 100%, 100% 10%; }
-            33% { background-position: 10% 75%, 40% 80%, 60% 20%; }
-            66% { background-position: 25% 35%, 80% 50%, 10% 10%; }
-            100% { background-position: 50% 50%, 30% 100%, 100% 10%; }
+            0% { background-position: 0% 50%, 100% 100%, 50% 0%; }
+            50% { background-position: 100% 50%, 0% 0%, 50% 100%; }
+            100% { background-position: 0% 50%, 100% 100%, 50% 0%; }
         }
     </style>
 </head>
@@ -281,7 +280,7 @@
 
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starCount = isMobile ? Math.floor(143 / 1.5) : 143; 
+            const starCount = isMobile ? Math.floor(143 / 2.15) : 143; 
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
@@ -312,8 +311,8 @@
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleColors = ['#64ffda', '#c82fec'];
-            const maxParticles = isMobile ? Math.floor(300 / 1.5) : 300;
-            const initialParticles = isMobile ? Math.floor(150 / 1.5) : 150;
+            const maxParticles = isMobile ? Math.floor(300 / 2.15) : 300;
+            const initialParticles = isMobile ? Math.floor(150 / 2.15) : 150;
 
             const createParticle = () => {
                 const particle = document.createElement('div');
