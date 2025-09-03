@@ -326,16 +326,24 @@
                 star.style.animationDuration = (0.5 + Math.random() * 1) + 's';
 
                 const sizeRandom = Math.random();
-                if (sizeRandom < 0.7) {
+                if (sizeRandom < 0.6) {
+                    // Small stars
                     const size = (1 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
-                } else if (sizeRandom < 0.9) {
+                } else if (sizeRandom < 0.8) {
+                    // Medium stars
                     const size = (2 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
-                } else {
+                } else if (sizeRandom < 0.95) {
+                    // Large stars
                     const size = (3 + Math.random()) * 3.6;
+                    star.style.width = size + 'px';
+                    star.style.height = size + 'px';
+                } else {
+                    // Extra large stars (5% of all stars)
+                    const size = (5 + Math.random() * 3) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 }
