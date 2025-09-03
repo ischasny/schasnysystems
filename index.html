@@ -53,7 +53,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 90%;
             pointer-events: none;
         }
 
@@ -74,19 +74,26 @@
 
         /* Glowing particles */
         .particle {
+            --travel-distance: 30vh;
             position: absolute;
             width: 4px;
             height: 4px;
             background: radial-gradient(circle, #64ffda 0%, transparent 70%);
             border-radius: 50%;
-            animation: particleFloat 6s linear infinite;
+            animation: particleFloat 40s linear infinite; /* Increased from 25s to 35s */
             opacity: 0.7;
         }
 
         @keyframes particleFloat {
-            0% { transform: translateY(100vh) translateX(0px); opacity: 1; }
+            0% { 
+                transform: translateY(var(--travel-distance)) translateX(0px); 
+                opacity: 1; 
+            }
             90% { opacity: 1; }
-            100% { transform: translateY(-20px) translateX(50px); opacity: 0; }
+            100% { 
+                transform: translateY(0px) translateX(20px); 
+                opacity: 0; 
+            }
         }
 
         /* Main title */
@@ -215,7 +222,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 200px;
+            height: 10%;
             overflow: hidden;
             pointer-events: none;
             z-index: 1;
@@ -280,7 +287,7 @@
 
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const starCount = isMobile ? Math.floor(143 / 2.15) : 143; 
+            const starCount = isMobile ? 50 : 143; 
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
@@ -311,8 +318,7 @@
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
             const particleColors = ['#64ffda', '#c82fec'];
-            const maxParticles = isMobile ? Math.floor(300 / 2.15) : 300;
-            const initialParticles = isMobile ? Math.floor(150 / 2.15) : 150;
+            const maxParticles = isMobile ? 15 : 30;
 
             const createParticle = () => {
                 const particle = document.createElement('div');
@@ -334,10 +340,6 @@
                     if (particle.parentNode) particle.parentNode.removeChild(particle);
                 }, 8000);
             };
-
-            for (let i = 0; i < initialParticles; i++) {
-                createParticle();
-            }
 
             setInterval(() => {
                 if (particlesContainer.children.length < maxParticles) createParticle();
