@@ -33,7 +33,6 @@
             max-width: 1300px;
             height: 100dvh; /* Changed from 100vh */
             margin: 0 auto;
-            overflow: hidden;
             z-index: 10; /* Ensure content is on top */
         }
 
@@ -105,7 +104,7 @@
             /* Added hovering animation by default */
             animation: hoverFloat 6s ease-in-out infinite; /* Made faster */
         }
-        
+       
         /* New keyframes for the hovering effect */
         @keyframes hoverFloat {
             0% { transform: translateY(0px); }
@@ -135,7 +134,7 @@
             text-shadow: 0 0 15px rgba(100, 255, 218, 0.6), 0 0 30px rgba(200, 47, 236, 0.4);
             transition: text-shadow 0.1s ease-out;
         }
-        
+       
         /* Action Buttons Container */
         .actions {
             position: absolute;
@@ -148,7 +147,7 @@
             align-items: center;
             gap: 1rem;
         }
-        
+       
         .action-btn {
             color: #a0a0a0;
             font-size: clamp(0.8rem, 2vw, 1rem);
@@ -215,18 +214,18 @@
             66% { transform: translate(-15px, 20px) scale(0.9); opacity: 0.4; }
         }
 
-        /* Northern Lights Effect - Fixed for Safari */
+        /* MODIFICATION: Northern Lights Effect updated for new position */
         .northern-lights {
-            position: fixed; /* Changed from absolute */
+            position: absolute; /* Changed from fixed to position within scene-wrapper */
             bottom: 0;
-            left: 0;
-            width: 100vw; /* Use viewport width */
-            height: 10vh; /* Use viewport height */
+            left: calc(50% - 50vw); /* Positioned to break out of container and span full width */
+            width: 100vw; /* Set to full viewport width */
+            height: 10vh; /* Increased height for better visibility */
             overflow: hidden;
             pointer-events: none;
-            z-index: 9; /* Adjusted for layering */
-            filter: blur(16px); /* Reduced blur for less intensity */
-            opacity: 0.8; /* Reduced opacity for less intensity */
+            z-index: 9; /* This z-index is now relative to the mountains (z-index: 8) */
+            filter: blur(16px); 
+            opacity: 0.8; 
             background-size: 200% 200%;
             animation: aurora-flow 15s linear infinite;
             background-image: 
@@ -263,9 +262,9 @@
             100% { background-position: 0% 50%, 100% 100%, 50% 0%; }
         }
 
-        /* New CSS for the mountain ridge */
+        /* Updated CSS for the mountain ridge */
         .mountain-ridge {
-            position: fixed;
+            position: absolute; /* Changed from 'fixed' to position within the scene-wrapper */
             bottom: 0;
             left: 0;
             width: 100%;
@@ -273,6 +272,10 @@
             z-index: 8; /* Adjusted for layering */
             pointer-events: none;
             opacity: 0.6; /* Added transparency */
+            
+            /* Added a CSS mask to create soft, faded edges */
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); /* For Safari compatibility */
         }
 
         .mountain-ridge svg {
@@ -280,7 +283,7 @@
             width: 100%;
             height: 100%; /* Making the SVG fill the new fixed height container */
         }
-        
+       
         /* The fill color of the mountain SVG will match the darkest part of the background gradient */
         .mountain-ridge svg path {
             fill: #0a0415;
@@ -305,29 +308,29 @@
                 <div class="title-main">SCHASNY</div>
                 <div class="title-sub">systems</div>
             </div>
-            
+           
             <!-- Actions -->
             <div class="actions">
                  <a href="mailto:systems@schasny.org" class="action-btn">
-                    <!-- 8-bit envelope icon -->
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2 5h20v2h-2v12h-16v-12h-2v-2zm4 2v10h12v-10h-12zm2 2h8v2h-8v-2zm0 4h5v2h-5v-2z" fill-rule="evenodd" clip-rule="evenodd"/>
-                    </svg>
-                    Contact Us
+                     <!-- 8-bit envelope icon -->
+                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                         <path d="M2 5h20v2h-2v12h-16v-12h-2v-2zm4 2v10h12v-10h-12zm2 2h8v2h-8v-2zm0 4h5v2h-5v-2z" fill-rule="evenodd" clip-rule="evenodd"/>
+                     </svg>
+                     Contact Us
                  </a>
             </div>
 
             <!-- Floating particles container -->
             <div id="particles"></div>
         </div>
+
+        <!-- Mountain ridge container is now INSIDE the scene-wrapper -->
+        <div class="mountain-ridge" id="mountain-ridge"></div>
+
+        <!-- MODIFICATION: Northern Lights is now INSIDE the wrapper to properly layer with the mountains -->
+        <div class="northern-lights"></div>
     </div>
-    
-    <!-- Mountain ridge container -->
-    <div class="mountain-ridge" id="mountain-ridge"></div>
-
-    <!-- Northern Lights is now outside the wrapper for full-screen width -->
-    <div class="northern-lights"></div>
-
+   
     <script>
         // --- Visual Effects Functions ---
 
@@ -387,17 +390,17 @@
             const createParticle = () => {
                 const particle = document.createElement('div');
                 const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
-                
+               
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
-                
+               
                 const duration = 4 + Math.random() * 4;
                 particle.style.animationDuration = duration + 's';
                 // FIX: Add a random negative delay to make particles appear instantly mid-flight
                 particle.style.animationDelay = `-${Math.random() * duration}s`;
 
                 particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
-                
+               
                 particlesContainer.appendChild(particle);
 
                 setTimeout(() => {
@@ -441,7 +444,7 @@
                 mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
                 subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
             });
-            
+           
             scene.addEventListener('mouseleave', () => {
                 // Reset transform to allow CSS animation to take over
                 title.style.transform = '';
@@ -475,65 +478,65 @@
 
             // generate midpoint displacement points
             function displaceMap(height, displace, roughness, power) {
-              const points = []
+             const points = []
 
-              // set initial left point
-              points[0] = height / 2 + (Math.random() * displace * 2) - displace
+             // set initial left point
+             points[0] = height / 2 + (Math.random() * displace * 2) - displace
 
-              // set initial right point
-              points[power] = height / 2 + (Math.random() * displace * 2) - displace
-              displace *= roughness
+             // set initial right point
+             points[power] = height / 2 + (Math.random() * displace * 2) - displace
+             displace *= roughness
 
-              // increase number of segments to maximum
-              for (let i = 1; i < power; i *= 2) {
-                // for each segment, find centre point
-                for (let j = (power / i) / 2; j < power; j += power / i) {
-                  points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2)
-                  points[j] += (Math.random() * displace * 2) - displace
-                }
+             // increase number of segments to maximum
+             for (let i = 1; i < power; i *= 2) {
+                 // for each segment, find centre point
+                 for (let j = (power / i) / 2; j < power; j += power / i) {
+                     points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2)
+                     points[j] += (Math.random() * displace * 2) - displace
+                 }
 
-                // reduce random range
-                displace *= roughness
-              }
+                 // reduce random range
+                 displace *= roughness
+             }
 
-              return points
+             return points
             }
 
             // format points in [x, y] array
             function line(width, points) {
-              const sep = width / (points.length - 1)
-              return points.map((val, i) => ([
-                i * sep,
-                val
-              ]))
+             const sep = width / (points.length - 1)
+             return points.map((val, i) => ([
+                 i * sep,
+                 val
+             ]))
             }
 
             // convert points into SVG path
             function convertPath(width, height, points) {
-              // add first M (move) command
-              const first = points.shift()
-              let path = `M ${first[0]} ${first[1]}`
+             // add first M (move) command
+             const first = points.shift()
+             let path = `M ${first[0]} ${first[1]}`
 
-              // iterate through points adding L (line) commands to path
-              points.forEach(val => {
-                path += ` L ${val[0]} ${val[1]}`
-              })
+             // iterate through points adding L (line) commands to path
+             points.forEach(val => {
+                 path += ` L ${val[0]} ${val[1]}`
+             })
 
-              // close path
-              path += ` L ${width} ${height} L 0 ${height} Z`
+             // close path
+             path += ` L ${width} ${height} L 0 ${height} Z`
 
-              return path
+             return path
             }
 
             // generate SVG from path
             function genSvg(width, height, path) {
-              return `
-                <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill="currentColor" d="${path}"></path>
-                </svg>
-              `
+             return `
+                 <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                     <path fill="currentColor" d="${path}"></path>
+                 </svg>
+             `
             }
-            
+           
             divider();
         }
 
@@ -545,3 +548,5 @@
     </script>
 </body>
 </html>
+
+
