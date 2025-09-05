@@ -552,7 +552,7 @@
         const isPointerDevice = window.matchMedia('(pointer: fine)').matches;
 
         if (isPointerDevice) {
-            // MODIFICATION: Changed event listener to the whole document
+             // Logic for devices with fine pointers (mice, trackpads)
             document.addEventListener('mousemove', function(e) {
                 // MODIFICATION: Calculate mouse position relative to the whole window
                 const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -774,4 +774,5 @@
     </script>
 </body>
 </html>
+
 
