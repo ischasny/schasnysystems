@@ -573,16 +573,29 @@
                 title.style.transform = '';
                 stars.style.transform = '';
             });
+            
+            explorer.addEventListener('mouseenter', () => {
+                speechBubble.classList.add('visible');
+            });
+
+            explorer.addEventListener('mouseleave', () => {
+                speechBubble.classList.remove('visible');
+            });
+        } else {
+             // MODIFICATION: Logic for touch devices
+            explorer.addEventListener('touchstart', (e) => {
+                e.stopPropagation(); // Prevents the scene listener from firing
+                speechBubble.classList.toggle('visible');
+            });
+
+            scene.addEventListener('touchstart', (e) => {
+                // If the tap is anywhere other than the explorer, hide the bubble
+                if (e.target !== explorer) {
+                    speechBubble.classList.remove('visible');
+                }
+            });
         }
         
-        explorer.addEventListener('mouseenter', () => {
-            speechBubble.classList.add('visible');
-        });
-
-        explorer.addEventListener('mouseleave', () => {
-            speechBubble.classList.remove('visible');
-        });
-
         // MODIFICATION: Add onload event listener to fix race condition
         explorer.onload = calculateExplorerPosition;
 
