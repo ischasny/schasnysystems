@@ -444,7 +444,25 @@
             background: rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(5px);
             font-family: 'Pixelify Sans', sans-serif;
+            display: flex; /* MODIFICATION */
+            align-items: center;
+            gap: 0.5rem;
         }
+
+        /* NEW: Price change indicator styles */
+        #btc-change {
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .price-up {
+            color: #64ffda;
+        }
+
+        .price-down {
+            color: #ff648a;
+        }
+
 
         /* NEW: Tip Modal Styles */
         .modal-overlay {
@@ -569,7 +587,11 @@
         <!-- NEW: Data Satellite -->
         <div class="data-satellite">
             <svg class="satellite-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 9h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm6 2v-2h-2v2h2zm-1-3h-1v-1h-1v-1h-1v-1h-2v-1h-1v1h-2v1h-1v1h-1v1h-1v1h-1v2h1v1h1v1h1v1h1v1h1v-1h1v-1h2v-1h1v-1h1v-1h1v-2h-1v-1zm-3 4h-2v-2h2v2zm-4 0h-2v-2h2v2z"/></svg>
-            <div class="satellite-data" id="btc-price">Loading data...</div>
+            <!-- MODIFICATION: Container for satellite data -->
+            <div class="satellite-data">
+                <span id="btc-price">Loading...</span>
+                <span id="btc-change"></span>
+            </div>
         </div>
         <div class="container">
             <div class="stars" id="stars"></div>
@@ -848,6 +870,7 @@
         async function updateCoinGeckoData() {
             const speechBubbleEl = document.querySelector('.speech-bubble');
             const priceEl = document.getElementById('btc-price');
+            const changeEl = document.getElementById('btc-change');
 
             try {
                 const response = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin');
@@ -867,8 +890,10 @@
                      speechBubbleEl.textContent = "Data unavailable";
                 }
 
-                // Update Satellite Price
+                // Update Satellite Price and 24h Change
                 const price = data.market_data.current_price.usd;
+                const priceChange24h = data.market_data.price_change_percentage_24h;
+
                 if (price != null) {
                     const formattedPrice = new Intl.NumberFormat('en-US', {
                         style: 'currency',
@@ -881,11 +906,25 @@
                     priceEl.textContent = "Signal Lost";
                 }
 
+                if (priceChange24h != null) {
+                    const formattedChange = priceChange24h.toFixed(2);
+                    if (priceChange24h >= 0) {
+                        changeEl.textContent = `▲ +${formattedChange}%`;
+                        changeEl.className = 'price-up';
+                    } else {
+                        changeEl.textContent = `▼ ${formattedChange}%`;
+                        changeEl.className = 'price-down';
+                    }
+                } else {
+                    changeEl.textContent = '';
+                }
+
 
             } catch (error) {
                 console.error("Failed to fetch CoinGecko data:", error);
                 speechBubbleEl.textContent = "¯\\_(ツ)_/¯";
                 priceEl.textContent = "Signal Lost";
+                changeEl.textContent = '';
             }
         }
         
