@@ -549,9 +549,11 @@
         const stars = document.getElementById('stars');
         const explorer = document.querySelector('.explorer-character');
         const speechBubble = document.querySelector('.speech-bubble');
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        // MODIFICATION: Universal click/tap logic
+        const isPointerDevice = window.matchMedia('(pointer: fine)').matches;
 
-        if (!isTouchDevice) {
+        if (isPointerDevice) {
+             // Logic for devices with fine pointers (mice, trackpads)
             scene.addEventListener('mousemove', function(e) {
                 const rect = scene.getBoundingClientRect();
                 const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
@@ -566,14 +568,13 @@
                 const starsOffsetX = mouseX * -20; 
                 const starsOffsetY = mouseY * -20;
                 stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
-
             });
             
             scene.addEventListener('mouseleave', () => {
                 title.style.transform = '';
                 stars.style.transform = '';
             });
-            
+
             explorer.addEventListener('mouseenter', () => {
                 speechBubble.classList.add('visible');
             });
@@ -581,20 +582,22 @@
             explorer.addEventListener('mouseleave', () => {
                 speechBubble.classList.remove('visible');
             });
-        } else {
-             // MODIFICATION: Logic for touch devices
-            explorer.addEventListener('touchstart', (e) => {
-                e.stopPropagation(); // Prevents the scene listener from firing
-                speechBubble.classList.toggle('visible');
-            });
-
-            scene.addEventListener('touchstart', (e) => {
-                // If the tap is anywhere other than the explorer, hide the bubble
-                if (e.target !== explorer) {
-                    speechBubble.classList.remove('visible');
-                }
-            });
         }
+        
+        // MODIFICATION: Universal click/tap handler for all devices
+        explorer.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents the scene listener from firing
+            speechBubble.classList.toggle('visible');
+        });
+
+        // Use 'click' for the scene as well, as it covers taps and trackpad clicks
+        scene.addEventListener('click', (e) => {
+            // If the click is anywhere other than the explorer, hide the bubble
+            if (e.target !== explorer) {
+                speechBubble.classList.remove('visible');
+            }
+        });
+
         
         // MODIFICATION: Add onload event listener to fix race condition
         explorer.onload = calculateExplorerPosition;
