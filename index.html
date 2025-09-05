@@ -187,15 +187,12 @@
 
         /* Action Buttons Container */
         .actions {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
             z-index: 10;
             display: flex;
-            flex-direction: row; /* MODIFIED */
+            flex-direction: row; 
             align-items: center;
             gap: 1rem;
+            margin-top: 2rem; /* MODIFICATION: Positioned below title */
         }
         
         .action-btn {
@@ -234,7 +231,7 @@
             }
 
             .actions {
-                bottom: 1rem;
+                flex-direction: column; 
             }
              .action-btn {
                 font-size: 0.8rem;
