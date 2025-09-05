@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap" rel="stylesheet">
     <!-- Added Pixelify Sans font -->
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/icon.png">
     <style>
         * {
             margin: 0;
@@ -357,8 +358,9 @@
     </div>
     
     <script>
-        const isMobile = window.innerWidth <= 768;
+        let isMobile = window.innerWidth <= 768;
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        let peakPoint = null; // NEW: Store the peak point globally
 
         if (isSafari) {
             document.body.classList.add('safari-browser');
@@ -433,14 +435,6 @@
         const stars = document.getElementById('stars');
         const explorer = document.querySelector('.explorer-character');
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        let explorerPositionOffset = 5.5;
-        if (isSafari) {
-            explorerPositionOffset = 7;
-        }
-        if (isMobile) {
-            explorerPositionOffset += 1;
-        }
-
 
         if (!isTouchDevice) {
             scene.addEventListener('mousemove', function(e) {
@@ -465,58 +459,69 @@
                 stars.style.transform = '';
             });
         }
+        
+        // NEW: Lightweight function to calculate and apply explorer's position in pixels
+        function calculateExplorerPosition() {
+            const explorerEl = document.querySelector('.explorer-character');
+            const mountainEl = document.querySelector('.mountain-ridge');
+            if (!explorerEl || !mountainEl || !peakPoint) return;
+
+            const svgHeight = 100; // From mountain generator config
+
+            // --- Pixel-based vertical positioning ---
+            const mountainContainerHeightPixels = mountainEl.offsetHeight;
+            
+            // Calculate the peak's Y position in pixels from the bottom of the container
+            const y_from_bottom_svg = svgHeight - peakPoint[1]; // peakPoint is [x, y]
+            const peak_y_pixels_from_bottom = (y_from_bottom_svg / svgHeight) * mountainContainerHeightPixels;
+
+            // This offset (in pixels) places the character's feet on the mountain, not the bottom of his image's bounding box.
+            let pixelOffset = 70; 
+
+            explorerEl.style.bottom = `${peak_y_pixels_from_bottom - pixelOffset}px`;
+        }
 
         function createMountainRidge() {
             const WIDTH = 500;
             const HEIGHT = 100;
-            // MODIFICATION: Reduce iterations for mobile screens
             const ITERATIONS = isMobile ? 5 : 6;
             const ROUGHNESS = 0.7;
+
+            // This function runs once to find the peak and do the initial placement.
+            function findPeakAndPositionExplorer(points) {
+                const explorerEl = document.querySelector('.explorer-character');
+                if (!explorerEl || points.length === 0) return;
+
+                const searchArea = points.slice(Math.floor(points.length * 0.1), Math.floor(points.length * 0.7));
+                if (searchArea.length === 0) return;
+
+                let foundPeak = searchArea[0];
+                for (let i = 1; i < searchArea.length; i++) {
+                    if (searchArea[i][1] < foundPeak[1]) {
+                        foundPeak = searchArea[i];
+                    }
+                }
+                peakPoint = foundPeak; // Store the found peak globally
+                
+                // Set horizontal position (only needs to be done once)
+                const svgWidth = WIDTH;
+                const x_percent = (peakPoint[0] / svgWidth) * 100;
+                explorerEl.style.left = `${x_percent}%`;
+
+                // Do the initial vertical position calculation
+                calculateExplorerPosition();
+            }
 
             function divider() {
                 const segments = Math.pow(2, ITERATIONS);
                 const points = line(WIDTH, displaceMap(HEIGHT, HEIGHT / 3, ROUGHNESS, segments));
-                // MODIFICATION: Pass a copy of points to convertPath since it mutates the array
+                
                 const path = convertPath(WIDTH, HEIGHT, [...points]); 
                 const svg = genSvg(WIDTH, HEIGHT, path);
                 document.getElementById('mountain-ridge').innerHTML = svg;
 
-                // NEW: Position the character on a peak using the original points data
-                positionExplorerOnPeak(points);
-            }
-
-            // NEW: Function to position the character on the highest peak
-            function positionExplorerOnPeak(points) {
-                const explorerEl = document.querySelector('.explorer-character');
-                if (!explorerEl || points.length === 0) return;
-
-                // Find the highest peak in a central area of the mountains to avoid edges
-                const searchArea = points.slice(Math.floor(points.length * 0.1), Math.floor(points.length * 0.7));
-                if (searchArea.length === 0) return;
-
-                let peakPoint = searchArea[0]; // [x, y] -> remember y is inverted (0 is top)
-                for (let i = 1; i < searchArea.length; i++) {
-                    if (searchArea[i][1] < peakPoint[1]) { // A smaller y value is a higher peak
-                        peakPoint = searchArea[i];
-                    }
-                }
-                
-                // The points are relative to the SVG's viewBox (WIDTH x HEIGHT)
-                const svgWidth = WIDTH;
-                const svgHeight = HEIGHT;
-
-                // Calculate the percentage position for CSS 'left' property
-                const x_percent = (peakPoint[0] / svgWidth) * 100;
-
-                // Calculate the 'bottom' position in vh units based on the mountain container's height
-                const y_from_bottom_svg = svgHeight - peakPoint[1];
-                const mountainContainerHeightVH = 20; // from .mountain-ridge CSS
-                const bottom_vh = (y_from_bottom_svg / svgHeight) * mountainContainerHeightVH;
-
-                // Apply the dynamic styles to the character element
-                explorerEl.style.left = `${x_percent}%`;
-                // MODIFICATION: Adjust by a larger value so the character's feet are on the line
-                explorerEl.style.bottom = `${bottom_vh - explorerPositionOffset}vh`;
+                // Find the peak and set the character's position for the first time
+                findPeakAndPositionExplorer(points);
             }
 
             function displaceMap(height, displace, roughness, power) {
@@ -557,6 +562,28 @@
         createStars();
         createParticles();
         createMountainRidge();
+
+        // --- Dynamic Resize Handling ---
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        const handleResize = debounce(() => {
+            // When the window resizes, update the mobile flag
+            isMobile = window.innerWidth <= 768;
+            // And then run the lightweight position calculation
+            calculateExplorerPosition();
+        }, 100); // 100ms delay is responsive but not overwhelming
+
+        window.addEventListener('resize', handleResize);
 
     </script>
 </body>
