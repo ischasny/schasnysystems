@@ -551,30 +551,27 @@
         const speechBubble = document.querySelector('.speech-bubble');
         const isPointerDevice = window.matchMedia('(pointer: fine)').matches;
 
+        // MODIFICATION: Parallax effect is now always on for any device that can send mousemove events
+        document.addEventListener('mousemove', function(e) {
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            const titleOffsetX = mouseX * 20;
+            const titleOffsetY = mouseY * 20;
+            title.style.transform = `translate(${titleOffsetX}px, ${titleOffsetY}px)`;
+
+            const starsOffsetX = mouseX * -10;
+            const starsOffsetY = mouseY * -10;
+            stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
+        });
+
+        document.addEventListener('mouseleave', () => {
+            title.style.transform = '';
+            stars.style.transform = '';
+        });
+
+        // MODIFICATION: Hover effect for bubble is only for devices with a fine pointer
         if (isPointerDevice) {
-             // Logic for devices with fine pointers (mice, trackpads)
-            document.addEventListener('mousemove', function(e) {
-                // MODIFICATION: Calculate mouse position relative to the whole window
-                const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-
-                // Title parallax
-                const titleOffsetX = mouseX * 20;
-                const titleOffsetY = mouseY * 20;
-                title.style.transform = `translate(${titleOffsetX}px, ${titleOffsetY}px)`;
-
-                // Stars parallax
-                const starsOffsetX = mouseX * -10; 
-                const starsOffsetY = mouseY * -10;
-                stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
-            });
-            
-            // MODIFICATION: Changed event listener to the whole document
-            document.addEventListener('mouseleave', () => {
-                title.style.transform = '';
-                stars.style.transform = '';
-            });
-
             explorer.addEventListener('mouseenter', () => {
                 speechBubble.classList.add('visible');
             });
@@ -592,7 +589,6 @@
 
         // Use 'click' for the scene as well, as it covers taps and trackpad clicks
         scene.addEventListener('click', (e) => {
-            // If the click is anywhere other than the explorer, hide the bubble
             if (e.target !== explorer) {
                 speechBubble.classList.remove('visible');
             }
@@ -774,5 +770,4 @@
     </script>
 </body>
 </html>
-
 
