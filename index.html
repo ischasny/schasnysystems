@@ -368,10 +368,82 @@
             border-top: 10px solid rgba(255, 255, 255, 0.9);
         }
 
+        /* MODIFIED: Styles for the Data Satellite */
+        .data-satellite {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 5;
+            /* MODIFICATION: Switched to a shorter, alternating animation that uses the 'left' property */
+            animation: orbitSatellite 30s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        /* MODIFIED: New satellite animation that stays within the screen bounds */
+        @keyframes orbitSatellite {
+            0% {
+                transform: translateY(0);
+                left: 2%; /* Start near left edge */
+                top: 20%;
+            }
+            25% {
+                transform: translateY(-20px);
+                left: 30%;
+                top: 15%;
+            }
+            50% {
+                transform: translateY(0);
+                left: 60%;
+                top: 18%;
+            }
+            75% {
+                transform: translateY(10px);
+                left: 80%;
+                top: 16%;
+            }
+            100% {
+                transform: translateY(0);
+                /* End near right edge, accounting for its own width to stay in bounds */
+                left: calc(100% - 200px); 
+                top: 20%;
+            }
+        }
+
+        .satellite-icon {
+            width: 32px;
+            height: 32px;
+            fill: #a0a0a0;
+        }
+
+        .satellite-data {
+            color: #a0a0a0;
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            text-decoration: none;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(5px);
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .data-satellite {
+                animation-duration: 40s;
+                top: 12%;
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="scene-wrapper">
+        <!-- NEW: Data Satellite -->
+        <div class="data-satellite">
+            <svg class="satellite-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 9h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm6 2v-2h-2v2h2zm-1-3h-1v-1h-1v-1h-1v-1h-2v-1h-1v1h-2v1h-1v1h-1v1h-1v1h-1v2h1v1h1v1h1v1h1v1h1v-1h1v-1h2v-1h1v-1h1v-1h1v-2h-1v-1zm-3 4h-2v-2h2v2zm-4 0h-2v-2h2v2z"/></svg>
+            <div class="satellite-data" id="btc-price">Loading data...</div>
+        </div>
         <div class="container">
             <div class="stars" id="stars"></div>
             <div class="glow-orb"></div>
@@ -613,35 +685,56 @@
             divider();
         }
 
-        // NEW: Function to fetch Bitcoin data and update the bubble
-        async function updateBitcoinBubble() {
+        // MODIFIED: Combined function to fetch all data from CoinGecko
+        async function updateCoinGeckoData() {
             const speechBubbleEl = document.querySelector('.speech-bubble');
+            const priceEl = document.getElementById('btc-price');
+
             try {
-                // This API returns the total bitcoins in circulation, in Satoshis
-                const response = await fetch('https://api.blockchain.info/q/totalbc');
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin');
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error(`Network response was not ok (${response.status})`);
                 }
-                const satoshis = await response.text();
-                const currentBitcoins = Number(satoshis) / 100000000; // 100 million satoshis in 1 BTC
-                const maxBitcoins = 21000000;
-                const remaining = maxBitcoins - currentBitcoins;
+                const data = await response.json();
 
-                // Format the number with commas (e.g., 1,234,567)
-                const formattedRemaining = Math.round(remaining).toLocaleString('en-US');
+                // Update Speech Bubble
+                const circulating = data.market_data.circulating_supply;
+                const maxSupply = data.market_data.max_supply;
+                if (circulating != null && maxSupply != null) {
+                    const remaining = maxSupply - circulating;
+                    const formattedRemaining = Math.round(remaining).toLocaleString('en-US');
+                    speechBubbleEl.textContent = `${formattedRemaining} left to discover...`;
+                } else {
+                     speechBubbleEl.textContent = "Data unavailable";
+                }
 
-                speechBubbleEl.textContent = `${formattedRemaining} left to discover...`;
+                // Update Satellite Price
+                const price = data.market_data.current_price.usd;
+                if (price != null) {
+                    const formattedPrice = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(price);
+                    priceEl.textContent = `${formattedPrice}`;
+                } else {
+                    priceEl.textContent = "Signal Lost";
+                }
+
 
             } catch (error) {
-                console.error("Failed to fetch Bitcoin data:", error);
-                speechBubbleEl.textContent = "Could not fetch data.";
+                console.error("Failed to fetch CoinGecko data:", error);
+                speechBubbleEl.textContent = "¯\\_(ツ)_/¯";
+                priceEl.textContent = "Signal Lost";
             }
         }
-
+        
         createStars();
         createParticles();
         createMountainRidge();
-        updateBitcoinBubble(); // Call the new function on page load
+        updateCoinGeckoData(); // Initial call for all crypto data
+        setInterval(updateCoinGeckoData, 300000); // Update all data every 5 minutes
 
         function debounce(func, wait) {
             let timeout;
