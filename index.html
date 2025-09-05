@@ -143,10 +143,10 @@
             }
             50% {
                 /* Text is up, so shadow is down and further offset */
-                text-shadow: 2px 3px 0px rgba(100, 255, 218, 0.4), 
-                             4px 6px 0px rgba(200, 47, 236, 0.2),
-                             0 0 29px rgba(100, 255, 218, 0.7), 
-                             0 0 46px rgba(200, 47, 236, 0.5);
+                text-shadow: 2px 4px 0px rgba(100, 255, 218, 0.4), 
+                             5px 7px 0px rgba(200, 47, 236, 0.2),
+                             0 0 35px rgba(100, 255, 218, 0.7), 
+                             0 0 55px rgba(200, 47, 236, 0.5);
             }
         }
 
@@ -156,10 +156,10 @@
             }
             50% {
                 /* Text is up, so shadow is down and further offset */
-                text-shadow: 1px 2px 0px rgba(100, 255, 218, 0.3), 
-                             3px 5px 0px rgba(200, 47, 236, 0.15),
-                             0 0 21px rgba(100, 255, 218, 0.6), 
-                             0 0 38px rgba(200, 47, 236, 0.4);
+                text-shadow: 1px 3px 0px rgba(100, 255, 218, 0.3), 
+                             4px 6px 0px rgba(200, 47, 236, 0.15),
+                             0 0 25px rgba(100, 255, 218, 0.6), 
+                             0 0 46px rgba(200, 47, 236, 0.4);
             }
         }
 
@@ -247,7 +247,7 @@
             height: 15vh;
             overflow: hidden;
             pointer-events: none;
-            z-index: 9;
+            z-index: 7; /* MODIFICATION: Moved behind mountains */
             filter: blur(16px); 
             opacity: 0.8; 
             background-size: 200% 200%;
@@ -307,6 +307,26 @@
             fill: #0a0415;
         }
 
+        /* MODIFIED: Styles for the explorer character */
+        .explorer-character {
+            position: absolute;
+            /* bottom and left are now set by JS to be dynamic */
+            width: 140px; 
+            z-index: 9; 
+            pointer-events: none; 
+            transform: translateX(-50%); /* Center the character over his calculated 'left' property */
+        }
+
+        @keyframes explorerIdle {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-5px); /* Gentle breathing motion */
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -331,6 +351,8 @@
             <div id="particles"></div>
         </div>
         <div class="mountain-ridge" id="mountain-ridge"></div>
+        <!-- NEW: Explorer Character -->
+        <img src="images/dude.png" alt="An explorer character standing on the mountain" class="explorer-character">
         <div class="northern-lights"></div>
     </div>
     
@@ -409,7 +431,13 @@
         const scene = document.querySelector('.scene-wrapper');
         const title = document.querySelector('.title');
         const stars = document.getElementById('stars');
+        const explorer = document.querySelector('.explorer-character');
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        let explorerPositionOffset = 5.5;
+        if (isSafari) {
+            explorerPositionOffset = 7;
+        }
+
 
         if (!isTouchDevice) {
             scene.addEventListener('mousemove', function(e) {
@@ -417,15 +445,16 @@
                 const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
                 const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-                // MODIFICATION: Increased multiplier for more prominent title movement
+                // Title parallax
                 const titleOffsetX = mouseX * 20;
                 const titleOffsetY = mouseY * 20;
                 title.style.transform = `translate(${titleOffsetX}px, ${titleOffsetY}px)`;
 
-                // MODIFICATION: Increased multiplier for more prominent star parallax
+                // Stars parallax
                 const starsOffsetX = mouseX * -20; 
                 const starsOffsetY = mouseY * -20;
                 stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
+
             });
             
             scene.addEventListener('mouseleave', () => {
@@ -437,15 +466,54 @@
         function createMountainRidge() {
             const WIDTH = 500;
             const HEIGHT = 100;
-            const ITERATIONS = 6;
+            // MODIFICATION: Reduce iterations for mobile screens
+            const ITERATIONS = isMobile ? 5 : 6;
             const ROUGHNESS = 0.7;
 
             function divider() {
                 const segments = Math.pow(2, ITERATIONS);
                 const points = line(WIDTH, displaceMap(HEIGHT, HEIGHT / 3, ROUGHNESS, segments));
-                const path = convertPath(WIDTH, HEIGHT, points);
+                // MODIFICATION: Pass a copy of points to convertPath since it mutates the array
+                const path = convertPath(WIDTH, HEIGHT, [...points]); 
                 const svg = genSvg(WIDTH, HEIGHT, path);
                 document.getElementById('mountain-ridge').innerHTML = svg;
+
+                // NEW: Position the character on a peak using the original points data
+                positionExplorerOnPeak(points);
+            }
+
+            // NEW: Function to position the character on the highest peak
+            function positionExplorerOnPeak(points) {
+                const explorerEl = document.querySelector('.explorer-character');
+                if (!explorerEl || points.length === 0) return;
+
+                // Find the highest peak in a central area of the mountains to avoid edges
+                const searchArea = points.slice(Math.floor(points.length * 0.1), Math.floor(points.length * 0.7));
+                if (searchArea.length === 0) return;
+
+                let peakPoint = searchArea[0]; // [x, y] -> remember y is inverted (0 is top)
+                for (let i = 1; i < searchArea.length; i++) {
+                    if (searchArea[i][1] < peakPoint[1]) { // A smaller y value is a higher peak
+                        peakPoint = searchArea[i];
+                    }
+                }
+                
+                // The points are relative to the SVG's viewBox (WIDTH x HEIGHT)
+                const svgWidth = WIDTH;
+                const svgHeight = HEIGHT;
+
+                // Calculate the percentage position for CSS 'left' property
+                const x_percent = (peakPoint[0] / svgWidth) * 100;
+
+                // Calculate the 'bottom' position in vh units based on the mountain container's height
+                const y_from_bottom_svg = svgHeight - peakPoint[1];
+                const mountainContainerHeightVH = 20; // from .mountain-ridge CSS
+                const bottom_vh = (y_from_bottom_svg / svgHeight) * mountainContainerHeightVH;
+
+                // Apply the dynamic styles to the character element
+                explorerEl.style.left = `${x_percent}%`;
+                // MODIFICATION: Adjust by a larger value so the character's feet are on the line
+                explorerEl.style.bottom = `${bottom_vh - explorerPositionOffset}vh`;
             }
 
             function displaceMap(height, displace, roughness, power) {
@@ -490,8 +558,5 @@
     </script>
 </body>
 </html>
-
-
-
 
 
