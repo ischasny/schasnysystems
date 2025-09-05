@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
     <title>Schasny Systems</title>
+    <meta name="description" content="An interactive, animated space-themed landing page for Schasny Systems, featuring live Bitcoin data, parallax stars, and a dynamic mountain landscape.">
+    <meta name="keywords" content="Schasny Systems, interactive, animation, Bitcoin data, parallax, web design, creative coding">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://systems.schasny.org/">
+    <meta property="og:title" content="Schasny Systems">
+    <meta property="og:description" content="An interactive, animated space-themed page featuring live Bitcoin data.">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://systems.schasny.org/">
+    <meta property="twitter:title" content="Schasny Systems">
+    <meta property="twitter:description" content="An interactive, animated space-themed page featuring live Bitcoin data.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://systems.schasny.org/" />
+    <!-- End of SEO Meta Tags -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Existing font -->
@@ -172,7 +193,7 @@
             transform: translateX(-50%);
             z-index: 10;
             display: flex;
-            flex-direction: column;
+            flex-direction: row; /* MODIFIED */
             align-items: center;
             gap: 1rem;
         }
@@ -428,6 +449,115 @@
             font-family: 'Pixelify Sans', sans-serif;
         }
 
+        /* NEW: Tip Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 4, 21, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #1a0f2e;
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            color: #ffffff;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal h3 {
+            font-family: 'Sixtyfour', monospace;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #64ffda;
+        }
+
+        .modal p {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #ffffff;
+        }
+
+        .btc-address-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.75rem;
+            border-radius: 10px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+        }
+
+        #btc-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #FBF3D5;
+            word-break: break-all;
+            text-align: left;
+            padding-right: 1rem;
+        }
+
+        #copy-btc-btn {
+            font-family: 'Pixelify Sans', sans-serif;
+            background: #64ffda;
+            color: #1a0f2e;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        #copy-btc-btn:hover {
+            background: #a0ffe7;
+        }
+
+
         @media (max-width: 768px) {
             .data-satellite {
                 animation-duration: 40s;
@@ -460,6 +590,13 @@
                       </svg>
                       Contact Us
                  </a>
+                 <!-- NEW: Tip Jar Button -->
+                 <button class="action-btn" id="tip-btn">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 4h6v2H9V4zm-2 2h2v2H7V6zm10 0h2v2h-2V6zM6 8h2v2H6V8zm12 0h2v2h-2V8zM5 10h2v2H5v-2zm14 0h2v2h-2v-2zM6 12h2v2H6v-2zm12 0h2v2h-2v-2zM7 14h2v2H7v-2zm10 0h2v2h-2v-2zM9 16h6v2H9v-2z"/>
+                    </svg>
+                    Tip Jar
+                </button>
             </div>
             <div id="particles"></div>
         </div>
@@ -471,6 +608,19 @@
         <div class="northern-lights"></div>
     </div>
     
+    <!-- NEW: Tip Jar Modal -->
+    <div class="modal-overlay" id="tip-modal-overlay">
+        <div class="modal">
+            <button class="close-btn" id="close-tip-modal">&times;</button>
+            <h3>Tip Jar</h3>
+            <p>If you'd like to support this page, you can send a tip to the following Bitcoin address:</p>
+            <div class="btc-address-container">
+                <span id="btc-address">bc1qfyntms5pgvqnkrhz3z6mjf9430vvt089m0nxzh</span>
+                <button id="copy-btc-btn">Copy</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let isMobile = window.innerWidth <= 768;
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -551,7 +701,7 @@
         const speechBubble = document.querySelector('.speech-bubble');
         const isPointerDevice = window.matchMedia('(pointer: fine)').matches;
 
-        // MODIFICATION: Parallax effect is now always on for any device that can send mousemove events
+        // Parallax effect is now always on for any device that can send mousemove events
         document.addEventListener('mousemove', function(e) {
             const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
             const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -570,7 +720,7 @@
             stars.style.transform = '';
         });
 
-        // MODIFICATION: Hover effect for bubble is only for devices with a fine pointer
+        // Hover effect for bubble is only for devices with a fine pointer
         if (isPointerDevice) {
             explorer.addEventListener('mouseenter', () => {
                 speechBubble.classList.add('visible');
@@ -742,6 +892,43 @@
             }
         }
         
+        // NEW: Tip Modal Logic
+        const tipBtn = document.getElementById('tip-btn');
+        const tipModalOverlay = document.getElementById('tip-modal-overlay');
+        const closeTipModalBtn = document.getElementById('close-tip-modal');
+        const copyBtcBtn = document.getElementById('copy-btc-btn');
+        const btcAddress = document.getElementById('btc-address').textContent;
+
+        tipBtn.addEventListener('click', () => {
+            tipModalOverlay.classList.add('visible');
+        });
+
+        function hideTipModal() {
+            tipModalOverlay.classList.remove('visible');
+        }
+
+        closeTipModalBtn.addEventListener('click', hideTipModal);
+        tipModalOverlay.addEventListener('click', (e) => {
+            if (e.target === tipModalOverlay) {
+                hideTipModal();
+            }
+        });
+
+        copyBtcBtn.addEventListener('click', () => {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = btcAddress;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            copyBtcBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtcBtn.textContent = 'Copy';
+            }, 2000);
+        });
+
+
         createStars();
         createParticles();
         createMountainRidge();
