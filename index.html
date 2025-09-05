@@ -511,6 +511,9 @@
             speechBubble.classList.remove('visible');
         });
 
+        // MODIFICATION: Add onload event listener to fix race condition
+        explorer.onload = calculateExplorerPosition;
+
         function calculateExplorerPosition() {
             const explorerEl = document.querySelector('.explorer-character');
             const mountainEl = document.querySelector('.mountain-ridge');
@@ -558,7 +561,10 @@
                 const x_percent = (peakPoint[0] / svgWidth) * 100;
                 explorerEl.style.left = `${x_percent}%`;
 
-                calculateExplorerPosition();
+                // MODIFICATION: If image is already cached/loaded, position it.
+                if (explorerEl.complete) {
+                    calculateExplorerPosition();
+                }
             }
 
             function divider() {
