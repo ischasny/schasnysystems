@@ -24,6 +24,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden; /* Added to prevent scrollbars from full-width aurora */
         }
 
         /* New wrapper to constrain the scene on large screens */
@@ -54,6 +55,7 @@
             width: 100%;
             height: 90%;
             pointer-events: none;
+            transition: transform 0.3s ease-out;
         }
 
         .star {
@@ -101,11 +103,10 @@
             z-index: 10;
             position: relative;
             line-height: 1.2;
-            /* Added hovering animation by default */
             animation: hoverFloat 6s ease-in-out infinite; /* Made faster */
+            transition: transform 0.3s ease-out;
         }
-       
-        /* New keyframes for the hovering effect */
+        
         @keyframes hoverFloat {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-11px); } /* Reduced amplitude by 30% */
@@ -121,7 +122,7 @@
             margin-bottom: -0.5rem; /* Reduced padding */
             display: block;
             text-shadow: 0 0 20px rgba(100, 255, 218, 0.7), 0 0 40px rgba(200, 47, 236, 0.5);
-            transition: text-shadow 0.1s ease-out;
+            animation: shadowFloatMain 6s ease-in-out infinite;
         }
 
         .title-sub {
@@ -132,9 +133,36 @@
             letter-spacing: 0.05em;
             display: block;
             text-shadow: 0 0 15px rgba(100, 255, 218, 0.6), 0 0 30px rgba(200, 47, 236, 0.4);
-            transition: text-shadow 0.1s ease-out;
+            animation: shadowFloatSub 6s ease-in-out infinite;
         }
-       
+        
+        /* MODIFICATION: Keyframes for a more prominent shadow floating effect */
+        @keyframes shadowFloatMain {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(100, 255, 218, 0.7), 0 0 40px rgba(200, 47, 236, 0.5);
+            }
+            50% {
+                /* Text is up, so shadow is down and further offset */
+                text-shadow: 6px 10px 0px rgba(100, 255, 218, 0.4), 
+                             12px 20px 0px rgba(200, 47, 236, 0.2),
+                             0 0 35px rgba(100, 255, 218, 0.7), 
+                             0 0 55px rgba(200, 47, 236, 0.5);
+            }
+        }
+
+        @keyframes shadowFloatSub {
+            0%, 100% {
+                text-shadow: 0 0 15px rgba(100, 255, 218, 0.6), 0 0 30px rgba(200, 47, 236, 0.4);
+            }
+            50% {
+                /* Text is up, so shadow is down and further offset */
+                text-shadow: 4px 8px 0px rgba(100, 255, 218, 0.3), 
+                             8px 16px 0px rgba(200, 47, 236, 0.15),
+                             0 0 25px rgba(100, 255, 218, 0.6), 
+                             0 0 45px rgba(200, 47, 236, 0.4);
+            }
+        }
+
         /* Action Buttons Container */
         .actions {
             position: absolute;
@@ -147,7 +175,7 @@
             align-items: center;
             gap: 1rem;
         }
-       
+        
         .action-btn {
             color: #a0a0a0;
             font-size: clamp(0.8rem, 2vw, 1rem);
@@ -160,7 +188,6 @@
             backdrop-filter: blur(10px);
             font-family: 'Pixelify Sans', sans-serif;
             cursor: pointer;
-            /* Added for icon alignment */
             display: flex;
             align-items: center;
             gap: 0.6rem;
@@ -173,17 +200,15 @@
             transform: translateY(-3px);
         }
 
-        /* Style for the new SVG icon */
         .action-btn svg {
             width: 1.2em;
             height: 1.2em;
             fill: currentColor;
         }
 
-        /* Responsive design */
         @media (max-width: 768px) {
             .title {
-                padding: 0 1.5rem; /* Increased padding for small screens */
+                padding: 0 1.5rem;
             }
 
             .actions {
@@ -214,16 +239,15 @@
             66% { transform: translate(-15px, 20px) scale(0.9); opacity: 0.4; }
         }
 
-        /* MODIFICATION: Northern Lights Effect updated for new position */
         .northern-lights {
-            position: absolute; /* Changed from fixed to position within scene-wrapper */
+            position: absolute;
             bottom: 0;
-            left: calc(50% - 50vw); /* Positioned to break out of container and span full width */
-            width: 100vw; /* Set to full viewport width */
-            height: 10vh; /* Increased height for better visibility */
+            left: calc(50% - 50vw);
+            width: 100vw;
+            height: 15vh;
             overflow: hidden;
             pointer-events: none;
-            z-index: 9; /* This z-index is now relative to the mountains (z-index: 8) */
+            z-index: 9;
             filter: blur(16px); 
             opacity: 0.8; 
             background-size: 200% 200%;
@@ -234,17 +258,15 @@
                 radial-gradient(at 45% 90%, rgba(100, 255, 218, 1) 0px, transparent 50%);
         }
 
-        /* Safari-specific fixes */
         .safari-browser .northern-lights {
-            filter: blur(12px); /* Reduced blur for better Safari performance */
-            opacity: 0.7; /* Reduced opacity */
+            filter: blur(12px);
+            opacity: 0.7;
             background-image: 
                 radial-gradient(at 10% 95%, rgba(100, 255, 218, 0.8) 0px, transparent 60%),
                 radial-gradient(at 80% 100%, rgba(200, 47, 236, 0.7) 0px, transparent 60%),
                 radial-gradient(at 45% 90%, rgba(100, 255, 218, 0.8) 0px, transparent 60%);
         }
 
-        /* Fallback for very old Safari versions */
         @supports not (filter: blur(10px)) {
             .northern-lights {
                 filter: none;
@@ -262,29 +284,25 @@
             100% { background-position: 0% 50%, 100% 100%, 50% 0%; }
         }
 
-        /* Updated CSS for the mountain ridge */
         .mountain-ridge {
-            position: absolute; /* Changed from 'fixed' to position within the scene-wrapper */
+            position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 20vh; /* Setting a constant height to prevent vertical resizing */
-            z-index: 8; /* Adjusted for layering */
+            height: 20vh;
+            z-index: 8;
             pointer-events: none;
-            opacity: 0.6; /* Added transparency */
-            
-            /* Added a CSS mask to create soft, faded edges */
+            opacity: 0.6;
             mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); /* For Safari compatibility */
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
 
         .mountain-ridge svg {
             display: block;
             width: 100%;
-            height: 100%; /* Making the SVG fill the new fixed height container */
+            height: 100%;
         }
-       
-        /* The fill color of the mountain SVG will match the darkest part of the background gradient */
+        
         .mountain-ridge svg path {
             fill: #0a0415;
         }
@@ -292,51 +310,32 @@
     </style>
 </head>
 <body>
-    <!-- New wrapper to constrain the scene on large screens -->
     <div class="scene-wrapper">
         <div class="container">
-            <!-- Starfield background -->
             <div class="stars" id="stars"></div>
-
-            <!-- Glowing orbs -->
             <div class="glow-orb"></div>
             <div class="glow-orb"></div>
             <div class="glow-orb"></div>
-
-            <!-- Main title -->
             <div class="title">
                 <div class="title-main">SCHASNY</div>
                 <div class="title-sub">systems</div>
             </div>
-           
-            <!-- Actions -->
             <div class="actions">
                  <a href="mailto:systems@schasny.org" class="action-btn">
-                     <!-- 8-bit envelope icon -->
-                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                         <path d="M2 5h20v2h-2v12h-16v-12h-2v-2zm4 2v10h12v-10h-12zm2 2h8v2h-8v-2zm0 4h5v2h-5v-2z" fill-rule="evenodd" clip-rule="evenodd"/>
-                     </svg>
-                     Contact Us
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                           <path d="M2 5h20v2h-2v12h-16v-12h-2v-2zm4 2v10h12v-10h-12zm2 2h8v2h-8v-2zm0 4h5v2h-5v-2z" fill-rule="evenodd" clip-rule="evenodd"/>
+                      </svg>
+                      Contact Us
                  </a>
             </div>
-
-            <!-- Floating particles container -->
             <div id="particles"></div>
         </div>
-
-        <!-- Mountain ridge container is now INSIDE the scene-wrapper -->
         <div class="mountain-ridge" id="mountain-ridge"></div>
-
-        <!-- MODIFICATION: Northern Lights is now INSIDE the wrapper to properly layer with the mountains -->
         <div class="northern-lights"></div>
     </div>
-   
+    
     <script>
-        // --- Visual Effects Functions ---
-
         const isMobile = window.innerWidth <= 768;
-
-        // Detect Safari browser
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
         if (isSafari) {
@@ -358,22 +357,18 @@
 
                 const sizeRandom = Math.random();
                 if (sizeRandom < 0.6) {
-                    // Small stars
                     const size = (1 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else if (sizeRandom < 0.8) {
-                    // Medium stars
                     const size = (2 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else if (sizeRandom < 0.95) {
-                    // Large stars
                     const size = (3 + Math.random()) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
                 } else {
-                    // Extra large stars (5% of all stars)
                     const size = (5 + Math.random() * 3) * 3.6;
                     star.style.width = size + 'px';
                     star.style.height = size + 'px';
@@ -390,17 +385,15 @@
             const createParticle = () => {
                 const particle = document.createElement('div');
                 const randomColor = particleColors[Math.floor(Math.random() * particleColors.length)];
-               
+                
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
-               
+                
                 const duration = 4 + Math.random() * 4;
                 particle.style.animationDuration = duration + 's';
-                // FIX: Add a random negative delay to make particles appear instantly mid-flight
                 particle.style.animationDelay = `-${Math.random() * duration}s`;
-
                 particle.style.background = `radial-gradient(circle, ${randomColor} 0%, transparent 70%)`;
-               
+                
                 particlesContainer.appendChild(particle);
 
                 setTimeout(() => {
@@ -413,51 +406,33 @@
             }, 50);
         }
 
-        // --- Event Listeners and Initializers ---
         const scene = document.querySelector('.scene-wrapper');
         const title = document.querySelector('.title');
-        const mainTitle = document.querySelector('.title-main');
-        const subTitle = document.querySelector('.title-sub');
-
-        // Check if it's a touch device before adding mouse-specific events
+        const stars = document.getElementById('stars');
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         if (!isTouchDevice) {
             scene.addEventListener('mousemove', function(e) {
-                // We need to calculate the mouse position relative to the scene wrapper, not the whole window
                 const rect = scene.getBoundingClientRect();
                 const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
                 const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
 
-                const offsetX = mouseX * 4.102;
-                const offsetY = mouseY * 4.102; 
-                const shadowOffsetX1 = mouseX * 5.54526;
-                const shadowOffsetY1 = mouseY * 5.54526;
-                const shadowOffsetX2 = mouseX * 11.09052;
-                const shadowOffsetY2 = mouseY * 11.09052;
+                // MODIFICATION: Increased multiplier for more prominent title movement
+                const titleOffsetX = mouseX * 20;
+                const titleOffsetY = mouseY * 20;
+                title.style.transform = `translate(${titleOffsetX}px, ${titleOffsetY}px)`;
 
-                title.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-
-                const baseShadowMain = `0 0 20px rgba(100, 255, 218, 0.7), 0 0 40px rgba(200, 47, 236, 0.5)`;
-                const baseShadowSub = `0 0 15px rgba(100, 255, 218, 0.6), 0 0 30px rgba(200, 47, 236, 0.4)`;
-
-                mainTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowMain}`;
-                subTitle.style.textShadow = `${shadowOffsetX1}px ${shadowOffsetY1}px 0 #64ffda, ${shadowOffsetX2}px ${shadowOffsetY2}px 0 #c82fec, ${baseShadowSub}`;
+                // MODIFICATION: Increased multiplier for more prominent star parallax
+                const starsOffsetX = mouseX * -20; 
+                const starsOffsetY = mouseY * -20;
+                stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
             });
-           
+            
             scene.addEventListener('mouseleave', () => {
-                // Reset transform to allow CSS animation to take over
                 title.style.transform = '';
-
-                // Also reset text shadows to their base state
-                const baseShadowMain = `0 0 20px rgba(100, 255, 218, 0.7), 0 0 40px rgba(200, 47, 236, 0.5)`;
-                const baseShadowSub = `0 0 15px rgba(100, 255, 218, 0.6), 0 0 30px rgba(200, 47, 236, 0.4)`;
-                mainTitle.style.textShadow = baseShadowMain;
-                subTitle.style.textShadow = baseShadowSub;
+                stars.style.transform = '';
             });
         }
-
-        // --- Mountain Ridge Generation Script ---
 
         function createMountainRidge() {
             const WIDTH = 500;
@@ -465,82 +440,49 @@
             const ITERATIONS = 6;
             const ROUGHNESS = 0.7;
 
-            // mountain divider
             function divider() {
                 const segments = Math.pow(2, ITERATIONS);
                 const points = line(WIDTH, displaceMap(HEIGHT, HEIGHT / 3, ROUGHNESS, segments));
                 const path = convertPath(WIDTH, HEIGHT, points);
                 const svg = genSvg(WIDTH, HEIGHT, path);
-
-                const mountainContainer = document.getElementById('mountain-ridge');
-                mountainContainer.innerHTML = svg;
+                document.getElementById('mountain-ridge').innerHTML = svg;
             }
 
-            // generate midpoint displacement points
             function displaceMap(height, displace, roughness, power) {
-             const points = []
-
-             // set initial left point
-             points[0] = height / 2 + (Math.random() * displace * 2) - displace
-
-             // set initial right point
-             points[power] = height / 2 + (Math.random() * displace * 2) - displace
-             displace *= roughness
-
-             // increase number of segments to maximum
+             const points = [];
+             points[0] = height / 2 + (Math.random() * displace * 2) - displace;
+             points[power] = height / 2 + (Math.random() * displace * 2) - displace;
+             displace *= roughness;
              for (let i = 1; i < power; i *= 2) {
-                 // for each segment, find centre point
                  for (let j = (power / i) / 2; j < power; j += power / i) {
-                     points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2)
-                     points[j] += (Math.random() * displace * 2) - displace
+                     points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2);
+                     points[j] += (Math.random() * displace * 2) - displace;
                  }
-
-                 // reduce random range
-                 displace *= roughness
+                 displace *= roughness;
              }
-
-             return points
+             return points;
             }
 
-            // format points in [x, y] array
             function line(width, points) {
-             const sep = width / (points.length - 1)
-             return points.map((val, i) => ([
-                 i * sep,
-                 val
-             ]))
+                const sep = width / (points.length - 1);
+                return points.map((val, i) => ([ i * sep, val ]));
             }
 
-            // convert points into SVG path
             function convertPath(width, height, points) {
-             // add first M (move) command
-             const first = points.shift()
-             let path = `M ${first[0]} ${first[1]}`
-
-             // iterate through points adding L (line) commands to path
-             points.forEach(val => {
-                 path += ` L ${val[0]} ${val[1]}`
-             })
-
-             // close path
-             path += ` L ${width} ${height} L 0 ${height} Z`
-
-             return path
+                const first = points.shift();
+                let path = `M ${first[0]} ${first[1]}`;
+                points.forEach(val => { path += ` L ${val[0]} ${val[1]}` });
+                path += ` L ${width} ${height} L 0 ${height} Z`;
+                return path;
             }
 
-            // generate SVG from path
             function genSvg(width, height, path) {
-             return `
-                 <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                     <path fill="currentColor" d="${path}"></path>
-                 </svg>
-             `
+                return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="${path}"></path></svg>`;
             }
-           
+            
             divider();
         }
 
-        // Initialize all visual effects immediately
         createStars();
         createParticles();
         createMountainRidge();
@@ -548,5 +490,4 @@
     </script>
 </body>
 </html>
-
 
