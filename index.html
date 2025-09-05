@@ -549,15 +549,14 @@
         const stars = document.getElementById('stars');
         const explorer = document.querySelector('.explorer-character');
         const speechBubble = document.querySelector('.speech-bubble');
-        // MODIFICATION: Universal click/tap logic
         const isPointerDevice = window.matchMedia('(pointer: fine)').matches;
 
         if (isPointerDevice) {
-             // Logic for devices with fine pointers (mice, trackpads)
-            scene.addEventListener('mousemove', function(e) {
-                const rect = scene.getBoundingClientRect();
-                const mouseX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-                const mouseY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+            // MODIFICATION: Changed event listener to the whole document
+            document.addEventListener('mousemove', function(e) {
+                // MODIFICATION: Calculate mouse position relative to the whole window
+                const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
 
                 // Title parallax
                 const titleOffsetX = mouseX * 20;
@@ -565,12 +564,13 @@
                 title.style.transform = `translate(${titleOffsetX}px, ${titleOffsetY}px)`;
 
                 // Stars parallax
-                const starsOffsetX = mouseX * -20; 
-                const starsOffsetY = mouseY * -20;
+                const starsOffsetX = mouseX * -10; 
+                const starsOffsetY = mouseY * -10;
                 stars.style.transform = `translate(${starsOffsetX}px, ${starsOffsetY}px)`;
             });
             
-            scene.addEventListener('mouseleave', () => {
+            // MODIFICATION: Changed event listener to the whole document
+            document.addEventListener('mouseleave', () => {
                 title.style.transform = '';
                 stars.style.transform = '';
             });
@@ -584,7 +584,7 @@
             });
         }
         
-        // MODIFICATION: Universal click/tap handler for all devices
+        // Universal click/tap handler for all devices
         explorer.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevents the scene listener from firing
             speechBubble.classList.toggle('visible');
@@ -599,7 +599,7 @@
         });
 
         
-        // MODIFICATION: Add onload event listener to fix race condition
+        // Add onload event listener to fix race condition
         explorer.onload = calculateExplorerPosition;
 
         function calculateExplorerPosition() {
@@ -649,7 +649,7 @@
                 const x_percent = (peakPoint[0] / svgWidth) * 100;
                 explorerEl.style.left = `${x_percent}%`;
 
-                // MODIFICATION: If image is already cached/loaded, position it.
+                // If image is already cached/loaded, position it.
                 if (explorerEl.complete) {
                     calculateExplorerPosition();
                 }
@@ -701,7 +701,7 @@
             divider();
         }
 
-        // MODIFIED: Combined function to fetch all data from CoinGecko
+        // Combined function to fetch all data from CoinGecko
         async function updateCoinGeckoData() {
             const speechBubbleEl = document.querySelector('.speech-bubble');
             const priceEl = document.getElementById('btc-price');
