@@ -308,7 +308,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 20vh;
+            height: 22vh;
             z-index: 8;
             pointer-events: none;
             opacity: 0.6;
@@ -832,18 +832,25 @@
             }
 
             function displaceMap(height, displace, roughness, power) {
-             const points = [];
-             points[0] = height / 2 + (Math.random() * displace * 2) - displace;
-             points[power] = height / 2 + (Math.random() * displace * 2) - displace;
-             displace *= roughness;
-             for (let i = 1; i < power; i *= 2) {
-                 for (let j = (power / i) / 2; j < power; j += power / i) {
-                     points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2);
-                     points[j] += (Math.random() * displace * 2) - displace;
-                 }
+                 const points = [];
+                 const MIN_PEAK_Y = 5; // Max Y value, smaller value = higher minimum peak
+
+                 points[0] = height / 2 + (Math.random() * displace * 2) - displace;
+                 points[power] = height / 2 + (Math.random() * displace * 2) - displace;
+                 
                  displace *= roughness;
-             }
-             return points;
+
+                 for (let i = 1; i < power; i *= 2) {
+                     for (let j = (power / i) / 2; j < power; j += power / i) {
+                         points[j] = ((points[j - (power / i) / 2] + points[j + (power / i) / 2]) / 2);
+                         points[j] += (Math.random() * displace * 2) - displace;
+                     }
+                     displace *= roughness;
+                 }
+                 for (let i = 0; i < points.length; i++) {
+                    points[i] -= MIN_PEAK_Y;
+                 }
+                 return points;
             }
 
             function line(width, points) {
